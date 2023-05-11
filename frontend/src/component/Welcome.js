@@ -1,6 +1,6 @@
 import { Grid, Typography } from "@material-ui/core";
 
-const Welcome = (props) => {
+const Welcome = () => {
   return (
     <Grid
       container
@@ -17,7 +17,7 @@ const Welcome = (props) => {
   );
 };
 
-export const ErrorPage = (props) => {
+export const ErrorPage = () => {
   return (
     <Grid
       container

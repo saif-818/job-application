@@ -3,7 +3,6 @@ import {
   Button,
   Grid,
   Typography,
-  Modal,
   Paper,
   makeStyles,
   TextField,
@@ -18,7 +17,7 @@ import { SetPopupContext } from "../App";
 
 import apiList from "../lib/apiList";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   body: {
     height: "inherit",
   },
@@ -27,7 +26,6 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    // padding: "30px",
   },
 }));
 
@@ -106,7 +104,6 @@ const MultifieldInput = (props) => {
 const Profile = (props) => {
   const classes = useStyles();
   const setPopup = useContext(SetPopupContext);
-  const [userData, setUserData] = useState();
   const [open, setOpen] = useState(false);
 
   const [profileDetails, setProfileDetails] = useState({
@@ -164,14 +161,6 @@ const Profile = (props) => {
           message: "Error",
         });
       });
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const editDetails = () => {
-    setOpen(true);
   };
 
   const handleUpdate = () => {
@@ -308,9 +297,6 @@ const Profile = (props) => {
           </Paper>
         </Grid>
       </Grid>
-      {/* <Modal open={open} onClose={handleClose} className={classes.popupDialog}> */}
-
-      {/* </Modal> */}
     </>
   );
 };

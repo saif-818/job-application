@@ -18,14 +18,14 @@ let schema = new mongoose.Schema(
         },
         startYear: {
           type: Number,
-          min: 1930,
+          min: 2000,
           max: new Date().getFullYear(),
           required: true,
           validate: Number.isInteger,
         },
         endYear: {
           type: Number,
-          max: new Date().getFullYear(),
+          max: new Date().getFullYear()+4,
           validate: [
             { validator: Number.isInteger, msg: "Year should be an integer" },
             {

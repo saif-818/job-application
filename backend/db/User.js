@@ -13,6 +13,12 @@ let schema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      // validate :{
+      //   validator: function (v) {
+      //     return v.length < 8 ? false : v;
+      //   },
+      //   msg: "Password should contain atleast 8 characters",
+      // }
     },
     type: {
       type: String,

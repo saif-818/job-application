@@ -1,7 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const jwtAuth = require("../lib/jwtAuth");
-
 const User = require("../db/User");
 const JobApplicant = require("../db/JobApplicant");
 const Recruiter = require("../db/Recruiter");
@@ -48,16 +47,11 @@ router.post("/jobs", jwtAuth, (req, res) => {
     });
 });
 
-// to get all the jobs [pagination] [for recruiter personal and for everyone]
+// to get all the jobs [for recruiter personal and for everyone]
 router.get("/jobs", jwtAuth, (req, res) => {
   let user = req.user;
 
   let findParams = {};
-  let sortParams = {};
-
-  // const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
-  // const limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 10;
-  // const skip = page - 1 >= 0 ? (page - 1) * limit : 0;
 
   // to list down jobs posted by a particular recruiter
   if (user.type === "recruiter" && req.query.myjobs) {
@@ -67,110 +61,7 @@ router.get("/jobs", jwtAuth, (req, res) => {
     };
   }
 
-  if (req.query.q) {
-    findParams = {
-      ...findParams,
-      title: {
-        $regex: new RegExp(req.query.q, "i"),
-      },
-    };
-  }
-
-  if (req.query.jobType) {
-    let jobTypes = [];
-    if (Array.isArray(req.query.jobType)) {
-      jobTypes = req.query.jobType;
-    } else {
-      jobTypes = [req.query.jobType];
-    }
-    console.log(jobTypes);
-    findParams = {
-      ...findParams,
-      jobType: {
-        $in: jobTypes,
-      },
-    };
-  }
-
-  if (req.query.salaryMin && req.query.salaryMax) {
-    findParams = {
-      ...findParams,
-      $and: [
-        {
-          salary: {
-            $gte: parseInt(req.query.salaryMin),
-          },
-        },
-        {
-          salary: {
-            $lte: parseInt(req.query.salaryMax),
-          },
-        },
-      ],
-    };
-  } else if (req.query.salaryMin) {
-    findParams = {
-      ...findParams,
-      salary: {
-        $gte: parseInt(req.query.salaryMin),
-      },
-    };
-  } else if (req.query.salaryMax) {
-    findParams = {
-      ...findParams,
-      salary: {
-        $lte: parseInt(req.query.salaryMax),
-      },
-    };
-  }
-
-  if (req.query.duration) {
-    findParams = {
-      ...findParams,
-      duration: {
-        $lt: parseInt(req.query.duration),
-      },
-    };
-  }
-
-  if (req.query.asc) {
-    if (Array.isArray(req.query.asc)) {
-      req.query.asc.map((key) => {
-        sortParams = {
-          ...sortParams,
-          [key]: 1,
-        };
-      });
-    } else {
-      sortParams = {
-        ...sortParams,
-        [req.query.asc]: 1,
-      };
-    }
-  }
-
-  if (req.query.desc) {
-    if (Array.isArray(req.query.desc)) {
-      req.query.desc.map((key) => {
-        sortParams = {
-          ...sortParams,
-          [key]: -1,
-        };
-      });
-    } else {
-      sortParams = {
-        ...sortParams,
-        [req.query.desc]: -1,
-      };
-    }
-  }
-
   console.log(findParams);
-  console.log(sortParams);
-
-  // Job.find(findParams).collation({ locale: "en" }).sort(sortParams);
-  // .skip(skip)
-  // .limit(limit)
 
   let arr = [
     {
@@ -185,26 +76,7 @@ router.get("/jobs", jwtAuth, (req, res) => {
     { $match: findParams },
   ];
 
-  if (Object.keys(sortParams).length > 0) {
-    arr = [
-      {
-        $lookup: {
-          from: "recruiterinfos",
-          localField: "userId",
-          foreignField: "userId",
-          as: "recruiter",
-        },
-      },
-      { $unwind: "$recruiter" },
-      { $match: findParams },
-      {
-        $sort: sortParams,
-      },
-    ];
-  }
-
   console.log(arr);
-
   Job.aggregate(arr)
     .then((posts) => {
       if (posts == null) {
@@ -214,23 +86,6 @@ router.get("/jobs", jwtAuth, (req, res) => {
         return;
       }
       res.json(posts);
-    })
-    .catch((err) => {
-      res.status(400).json(err);
-    });
-});
-
-// to get info about a particular job
-router.get("/jobs/:id", jwtAuth, (req, res) => {
-  Job.findOne({ _id: req.params.id })
-    .then((job) => {
-      if (job == null) {
-        res.status(400).json({
-          message: "Job does not exist",
-        });
-        return;
-      }
-      res.json(job);
     })
     .catch((err) => {
       res.status(400).json(err);
@@ -346,51 +201,6 @@ router.get("/user", jwtAuth, (req, res) => {
   }
 });
 
-// get user details from id
-router.get("/user/:id", jwtAuth, (req, res) => {
-  User.findOne({ _id: req.params.id })
-    .then((userData) => {
-      if (userData === null) {
-        res.status(404).json({
-          message: "User does not exist",
-        });
-        return;
-      }
-
-      if (userData.type === "recruiter") {
-        Recruiter.findOne({ userId: userData._id })
-          .then((recruiter) => {
-            if (recruiter === null) {
-              res.status(404).json({
-                message: "User does not exist",
-              });
-              return;
-            }
-            res.json(recruiter);
-          })
-          .catch((err) => {
-            res.status(400).json(err);
-          });
-      } else {
-        JobApplicant.findOne({ userId: userData._id })
-          .then((jobApplicant) => {
-            if (jobApplicant === null) {
-              res.status(404).json({
-                message: "User does not exist",
-              });
-              return;
-            }
-            res.json(jobApplicant);
-          })
-          .catch((err) => {
-            res.status(400).json(err);
-          });
-      }
-    })
-    .catch((err) => {
-      res.status(400).json(err);
-    });
-});
 
 // update user details
 router.put("/user", jwtAuth, (req, res) => {
@@ -482,12 +292,6 @@ router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
   const data = req.body;
   const jobId = req.params.id;
 
-  // check whether applied previously
-  // find job
-  // check count of active applications < limit
-  // check user had < 10 active applications && check if user is not having any accepted jobs (user id)
-  // store the data in applications
-
   Application.findOne({
     userId: user._id,
     jobId: jobId,
@@ -503,7 +307,6 @@ router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
         });
         return;
       }
-
       Job.findOne({ _id: jobId })
         .then((job) => {
           if (job === null) {
@@ -597,29 +400,20 @@ router.get("/jobs/:id/applications", jwtAuth, (req, res) => {
   }
   const jobId = req.params.id;
 
-  // const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
-  // const limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 10;
-  // const skip = page - 1 >= 0 ? (page - 1) * limit : 0;
-
   let findParams = {
     jobId: jobId,
     recruiterId: user._id,
   };
-
   let sortParams = {};
-
   if (req.query.status) {
     findParams = {
       ...findParams,
       status: req.query.status,
     };
   }
-
   Application.find(findParams)
     .collation({ locale: "en" })
     .sort(sortParams)
-    // .skip(skip)
-    // .limit(limit)
     .then((applications) => {
       res.json(applications);
     })
@@ -628,13 +422,9 @@ router.get("/jobs/:id/applications", jwtAuth, (req, res) => {
     });
 });
 
-// recruiter/applicant gets all his applications [pagination]
+// recruiter/applicant gets all his applications
 router.get("/applications", jwtAuth, (req, res) => {
   const user = req.user;
-
-  // const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
-  // const limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 10;
-  // const skip = page - 1 >= 0 ? (page - 1) * limit : 0;
 
   Application.aggregate([
     {
@@ -683,27 +473,13 @@ router.get("/applications", jwtAuth, (req, res) => {
     });
 });
 
-// update status of application: [Applicant: Can cancel, Recruiter: Can do everything] [todo: test: done]
+// update status of application: [Applicant: Can cancel, Recruiter: Can do everything] 
 router.put("/applications/:id", jwtAuth, (req, res) => {
   const user = req.user;
   const id = req.params.id;
   const status = req.body.status;
-
-  // "applied", // when a applicant is applied
-  // "shortlisted", // when a applicant is shortlisted
-  // "accepted", // when a applicant is accepted
-  // "rejected", // when a applicant is rejected
-  // "deleted", // when any job is deleted
-  // "cancelled", // an application is cancelled by its author or when other application is accepted
-  // "finished", // when job is over
-
   if (user.type === "recruiter") {
     if (status === "accepted") {
-      // get job id from application
-      // get job info for maxPositions count
-      // count applications that are already accepted
-      // compare and if condition is satisfied, then save
-
       Application.findOne({
         _id: id,
         recruiterId: user._id,
@@ -726,7 +502,6 @@ router.put("/applications/:id", jwtAuth, (req, res) => {
               });
               return;
             }
-
             Application.countDocuments({
               recruiterId: user._id,
               jobId: job._id,
@@ -1343,38 +1118,5 @@ router.get("/rating", jwtAuth, (req, res) => {
     });
   });
 });
-
-// Application.findOne({
-//   _id: id,
-//   userId: user._id,
-// })
-//   .then((application) => {
-//     application.status = status;
-//     application
-//       .save()
-//       .then(() => {
-//         res.json({
-//           message: `Application ${status} successfully`,
-//         });
-//       })
-//       .catch((err) => {
-//         res.status(400).json(err);
-//       });
-//   })
-//   .catch((err) => {
-//     res.status(400).json(err);
-//   });
-
-// router.get("/jobs", (req, res, next) => {
-//   passport.authenticate("jwt", { session: false }, function (err, user, info) {
-//     if (err) {
-//       return next(err);
-//     }
-//     if (!user) {
-//       res.status(401).json(info);
-//       return;
-//     }
-//   })(req, res, next);
-// });
 
 module.exports = router;

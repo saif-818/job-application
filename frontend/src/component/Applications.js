@@ -3,18 +3,10 @@ import {
   Button,
   Chip,
   Grid,
-  IconButton,
-  InputAdornment,
   makeStyles,
   Paper,
-  TextField,
   Typography,
   Modal,
-  Slider,
-  FormControlLabel,
-  FormGroup,
-  MenuItem,
-  Checkbox,
 } from "@material-ui/core";
 import Rating from "@material-ui/lab/Rating";
 import axios from "axios";
@@ -23,7 +15,7 @@ import { SetPopupContext } from "../App";
 
 import apiList from "../lib/apiList";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   body: {
     height: "inherit",
   },
@@ -103,7 +95,6 @@ const ApplicationTile = (props) => {
         setOpen(false);
       })
       .catch((err) => {
-        // console.log(err.response);
         console.log(err);
         setPopup({
           open: true,
@@ -220,7 +211,7 @@ const ApplicationTile = (props) => {
   );
 };
 
-const Applications = (props) => {
+const Applications = () => {
   const setPopup = useContext(SetPopupContext);
   const [applications, setApplications] = useState([]);
 

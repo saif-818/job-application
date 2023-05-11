@@ -1,8 +1,8 @@
-import { Snackbar, Slide } from "@material-ui/core";
+import { Snackbar} from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 
 const MessagePopup = (props) => {
-  const handleClose = (event, reason) => {
+  const handleClose = (reason) => {
     if (reason === "clickaway") {
       return;
     }

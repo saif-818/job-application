@@ -1,9 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import {
   Button,
   Grid,
   Typography,
-  Modal,
   Paper,
   makeStyles,
   TextField,
@@ -16,7 +15,7 @@ import { SetPopupContext } from "../../App";
 
 import apiList from "../../lib/apiList";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   body: {
     height: "inherit",
   },
@@ -25,11 +24,10 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    // padding: "30px",
   },
 }));
 
-const CreateJobs = (props) => {
+const CreateJobs = () => {
   const classes = useStyles();
   const setPopup = useContext(SetPopupContext);
 
@@ -38,8 +36,7 @@ const CreateJobs = (props) => {
     maxApplicants: 100,
     maxPositions: 30,
     deadline: new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .substr(0, 16),
+      .toISOString(),
     skillsets: [],
     jobType: "Full Time",
     duration: 0,
@@ -72,8 +69,7 @@ const CreateJobs = (props) => {
           maxApplicants: 100,
           maxPositions: 30,
           deadline: new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000)
-            .toISOString()
-            .substr(0, 16),
+            .toISOString(),
           skillsets: [],
           jobType: "Full Time",
           duration: 0,

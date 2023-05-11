@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
 import {
   Grid,
-  TextField,
   Button,
   Typography,
   makeStyles,
@@ -17,7 +16,7 @@ import { SetPopupContext } from "../App";
 import apiList from "../lib/apiList";
 import isAuth from "../lib/isAuth";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   body: {
     padding: "60px 60px",
   },
@@ -29,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Login = (props) => {
+const Login = () => {
   const classes = useStyles();
   const setPopup = useContext(SetPopupContext);
 

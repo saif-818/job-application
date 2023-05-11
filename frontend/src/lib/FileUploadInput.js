@@ -1,14 +1,9 @@
-import { useState, useContext } from "react";
+import { useState} from "react";
 import { Grid, Button, TextField, LinearProgress } from "@material-ui/core";
 import { CloudUpload } from "@material-ui/icons";
-import Axios from "axios";
 
-import { SetPopupContext } from "../App";
 
 const FileUploadInput = (props) => {
-  const setPopup = useContext(SetPopupContext);
-
-  const { uploadTo, identifier, handleInput } = props;
 
   const [file, setFile] = useState("");
   const [uploadPercentage, setUploadPercentage] = useState(0);
@@ -17,38 +12,6 @@ const FileUploadInput = (props) => {
     console.log(file);
     const data = new FormData();
     data.append("file", file);
-    Axios.post(uploadTo, data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      onUploadProgress: (progressEvent) => {
-        setUploadPercentage(
-          parseInt(
-            Math.round((progressEvent.loaded * 100) / progressEvent.total)
-          )
-        );
-      },
-    })
-      .then((response) => {
-        console.log(response.data);
-        handleInput(identifier, response.data.url);
-        setPopup({
-          open: true,
-          severity: "success",
-          message: response.data.message,
-        });
-      })
-      .catch((err) => {
-        console.log(err.response);
-        setPopup({
-          open: true,
-          severity: "error",
-          message: err.response.statusText,
-          //   message: err.response.data
-          //     ? err.response.data.message
-          //     : err.response.statusText,
-        });
-      });
   };
 
   return (
@@ -70,11 +33,6 @@ const FileUploadInput = (props) => {
                 setUploadPercentage(0);
                 setFile(event.target.files[0]);
               }}
-              // onChange={onChange}
-              // onChange={
-              //   (e) => {}
-              //   //   setSource({ ...source, place_img: e.target.files[0] })
-              // }
             />
           </Button>
         </Grid>
