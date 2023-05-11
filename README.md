@@ -44,5 +44,6 @@ Directory structure of the web app is as follows:
   - mongoose
   - mongoose-type-email
   - passport
+  - passport-local
   - passport-jwt
   - uuid
