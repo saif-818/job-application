@@ -18,7 +18,7 @@ router.post("/jobs", jwtAuth, (req, res) => {
     res.status(401).json({
       message: "You don't have permissions to add jobs",
     });
-    return;
+    return;``
   }
 
   const data = req.body;
