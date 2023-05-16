@@ -8,7 +8,7 @@ require('dotenv').config();
 //const dbUrl = process.env.DB_URL
 // MongoDB
 mongoose
-  .connect("mongodb://localhost:27017", {
+  .connect("mongodb://localhost:27017/jobPortal", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -43,14 +43,6 @@ app.use(passportConfig.initialize());
 app.use("/auth", require("./routes/authRoutes"));
 app.use("/api", require("./routes/apiRoutes"));
 
-if(process.env.NODE_ENV =='production')
-{
-  const path = require('path')
-  app.get('/',(req,res)=>{
-    app.use(express.static(path.resolve(__dirname,'frontend','build')))
-    res.sendFile(path.resolve(__dirname,'frontend','build','index.html'))
-  })
-}
 
 app.listen(port, () => {
   console.log(`Server started on port ${port}!`);
