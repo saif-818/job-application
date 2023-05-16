@@ -5,10 +5,10 @@ const passportConfig = require("./lib/passportConfig");
 const cors = require("cors");
 const fs = require("fs");
 require('dotenv').config();
-const dbUrl = process.env.DB_URL
+//const dbUrl = process.env.DB_URL
 // MongoDB
 mongoose
-  .connect(dbUrl, {
+  .connect("mongodb://localhost:27017", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
