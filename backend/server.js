@@ -5,10 +5,10 @@ const passportConfig = require("./lib/passportConfig");
 const cors = require("cors");
 const fs = require("fs");
 require('dotenv').config();
-//const dbUrl = process.env.DB_URL
-// MongoDB
+const dbUrl = process.env.DB_URL
+// MongoDB - "mongodb://localhost:27017/jobPortal"
 mongoose
-  .connect("mongodb://localhost:27017/jobPortal", {
+  .connect(dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -29,7 +29,8 @@ if (!fs.existsSync("./public/profile")) {
 }
 
 const app = express();
-const port = 4444;
+const port = process.env.PORT || 4444;
+const BASE_URL = process.env.BASE_URL;
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
@@ -45,5 +46,5 @@ app.use("/api", require("./routes/apiRoutes"));
 
 
 app.listen(port, () => {
-  console.log(`Server started on port ${port}!`);
+  console.log(`Server started on localhost ${BASE_URL}!`);
 });
